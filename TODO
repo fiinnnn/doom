@@ -1,0 +1,23 @@
+- Memory management
+    Similar to doom zone system, track allocated blocks of memory and include
+    flags when to free. Should eliminate the need to manually free blocks.
+
+- Main game loop
+    - Fixed timestep updates
+    - Decouple from SDL events
+
+- Palette
+    Use 256 color palette. This would completely decouple the framebuffer
+    format from the rest of the engine.
+
+- Debug UI
+    Immediate mode UI to make debugging easier.
+    Nuklear / ImGui?
+
+- 3D rendering
+
+- 2D rendering
+    - Status bar
+    - Menu
+
+- Gameplay
