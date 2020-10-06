@@ -6,6 +6,7 @@
 #include <alloca.h>
 
 #include "log.h"
+#include "c_mem.h"
 
 int numlumps;
 lumpinfo_t* lumpinfo;
@@ -55,7 +56,7 @@ void add_file(char* filename)
         strncpy(lump->name, directory->name, 8);
     }
 
-    // files stay open, consider loading WADs in memory instead
+    // TODO: files stay open, consider loading WADs in memory instead
 }
 
 void w_init_files(char** files)
@@ -110,7 +111,7 @@ void* w_load_lump(int lump)
         exit(-1);
     }
 
-    void* buf = malloc(w_get_lump_length(lump));
+    void* buf = c_malloc(w_get_lump_length(lump), LT_STATIC);
 
     lumpinfo_t* l = lumpinfo+lump;
     fseek(l->handle, l->position, SEEK_SET);

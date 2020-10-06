@@ -4,6 +4,7 @@
 #include "w_level_lumps.h"
 #include "w_wad.h"
 #include "log.h"
+#include "c_mem.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -38,10 +39,10 @@ void load_blockmap(int lump)
     blockmap.cols = (float)lumpdata[2];
     blockmap.rows = (float)lumpdata[3];
 
-    uint16_t* offsets = lumpdata+4;
+    uint16_t* offsets = (uint16_t*)lumpdata+4;
 
     int numblocks = blockmap.cols * blockmap.rows;
-    blockmap.blocklists = malloc(numblocks * sizeof(int16_t*));
+    blockmap.blocklists = c_malloc(numblocks * sizeof(int16_t*), LT_LEVEL);
 
     for (int i = 0; i < numblocks; i++) {
         // every blocklist starts with 0x0000 and ends with 0xFFFF
@@ -52,7 +53,7 @@ void load_blockmap(int lump)
         while (lumpdata[off++] != -1)
             nlines++;
 
-        blockmap.blocklists[i] = malloc((nlines + 1) * sizeof(int16_t));
+        blockmap.blocklists[i] = c_malloc((nlines + 1) * sizeof(int16_t), LT_LEVEL);
 
         // fill blocklist, terminate with -1
         off = offsets[i] + 1;
@@ -62,13 +63,13 @@ void load_blockmap(int lump)
         blockmap.blocklists[i][nlines] = -1;
     }
 
-    free(lumpdata);
+    c_free(lumpdata);
 }
 
 void load_vertices(int lump)
 {
     numvertices = w_get_lump_length(lump) / sizeof(vertexlump_t);
-    vertices = malloc(numvertices * sizeof(vertex_t));
+    vertices = c_malloc(numvertices * sizeof(vertex_t), LT_LEVEL);
 
     uint8_t* lumpdata = w_load_lump(lump);
 
@@ -80,13 +81,13 @@ void load_vertices(int lump)
         v->y = (float)vl->y;
     }
 
-    free(lumpdata);
+    c_free(lumpdata);
 }
 
 void load_sectors(int lump)
 {
     numsectors = w_get_lump_length(lump) / sizeof(sectorlump_t);
-    sectors = malloc(numsectors * sizeof(sector_t));
+    sectors = c_malloc(numsectors * sizeof(sector_t), LT_LEVEL);
 
     uint8_t* lumpdata = w_load_lump(lump);
 
@@ -103,13 +104,13 @@ void load_sectors(int lump)
         s->tag = sl->tag;
     }
 
-    free(lumpdata);
+    c_free(lumpdata);
 }
 
 void load_sidedefs(int lump)
 {
     numsides = w_get_lump_length(lump) / sizeof(sidedeflump_t);
-    sides = malloc(numsides * sizeof(side_t));
+    sides = c_malloc(numsides * sizeof(side_t), LT_LEVEL);
 
     uint8_t* lumpdata = w_load_lump(lump);
 
@@ -125,13 +126,13 @@ void load_sidedefs(int lump)
         sd->sector = &sectors[sdl->sector];
     }
 
-    free(lumpdata);
+    c_free(lumpdata);
 }
 
 void load_linedefs(int lump)
 {
     numlines = w_get_lump_length(lump) / sizeof(linedeflump_t);
-    lines = malloc(numlines * sizeof(line_t));
+    lines = c_malloc(numlines * sizeof(line_t), LT_LEVEL);
 
     uint8_t* lumpdata = w_load_lump(lump);
 
@@ -158,7 +159,7 @@ void load_linedefs(int lump)
             ld->backsector = 0;
     }
 
-    free(lumpdata);
+    c_free(lumpdata);
 }
 
 void p_load_level(int episode, int map)

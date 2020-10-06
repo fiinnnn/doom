@@ -6,6 +6,7 @@
 #include "display.h"
 #include "def.h"
 #include "log.h"
+#include "c_mem.h"
 #include "w_wad.h"
 #include "p_level.h"
 #include "am_map.h"
@@ -38,8 +39,8 @@ int init() {
     }
 
     d = malloc(sizeof(struct display));
-    d->width = 740;
-    d->height = 500;
+    d->width = 1280;
+    d->height = 720;
 
     if(!display_init(d)) {
         LOG_ERROR("Failed to initialize display");
@@ -50,7 +51,7 @@ int init() {
 }
 
 void main_loop() {
-    uint32_t* buf = calloc(SCREENWIDTH * SCREENHEIGHT, sizeof(uint32_t));
+    uint32_t* buf = c_malloc(SCREENWIDTH * SCREENHEIGHT * sizeof(uint32_t), LT_STATIC);
 
     am_init(buf);
 
@@ -88,6 +89,8 @@ int main()
         return EXIT_FAILURE;
 
     main_loop();
+
+    c_free_all();
 
     display_destroy(d);
 

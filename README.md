@@ -8,6 +8,7 @@ if you don't have the game).
 
 Follows roughly the same naming conventions as the released DOOM source
 code:
+ - `c_`  core
  - `w_`  WAD I/O
  - `p_`  gameplay
  - `r_`  rendering
