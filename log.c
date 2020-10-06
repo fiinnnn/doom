@@ -30,7 +30,7 @@ void log_init(int level)
     state.quiet = 0;
 }
 
-void log_write(int level, const char* fmt, ...)
+void log_write(int level, const char* file, int line, const char* fmt, ...)
 {
     if (level < state.level || state.quiet)
         return;
@@ -43,8 +43,12 @@ void log_write(int level, const char* fmt, ...)
 
     strftime(time, sizeof(time), "%H:%M:%S", lt);
 
-    fprintf(stderr, "\033[90m[%s] %s%-5s\033[0m ",
-        time, level_colors[level], level_names[level]);
+    if (level <= LOGLEVEL_DEBUG)
+        fprintf(stderr, "\033[90m[%s] %s%-5s \033[90m%s:%d\033[0m ",
+            time, level_colors[level], level_names[level], file, line);
+    else
+        fprintf(stderr, "\033[90m[%s] %s%-5s\033[0m ",
+            time, level_colors[level], level_names[level]);
 
     va_start(args, fmt);
     vfprintf(stderr, fmt, args);
