@@ -8,13 +8,16 @@
 #include "log.h"
 #include "c_mem.h"
 
+wadinfo_t* headers;
+void** wads;
+
 int numlumps;
 lumpinfo_t* lumpinfo;
 
 /*
- * appends all lumps from the specified file to the lumpinfo array
+ * loads the specified WAD file
  */
-void add_file(char* filename)
+void add_file(char* filename, int i)
 {
     FILE* handle = fopen(filename, "rb");
     if (!handle) {
@@ -24,23 +27,27 @@ void add_file(char* filename)
 
     LOG_INFO("Adding WAD: %s", filename);
 
-    wadinfo_t header;
-    fread(&header, sizeof(header), 1, handle);
+    fseek(handle, 0, SEEK_END);
+    long filelength = ftell(handle);
+    wads[i] = c_malloc(filelength, LT_STATIC);
+
+    fseek(handle, 0, SEEK_SET);
+    fread(wads[i], sizeof(uint8_t), filelength, handle);
+    fclose(handle);
+
+    wadinfo_t header = *(wadinfo_t*) wads[i];
 
     if (strncmp(header.id, "IWAD", 4) && strncmp(header.id, "PWAD", 4)) {
         LOG_ERROR("%s doesn't have IWAD or PWAD id", filename);
         return;
     }
 
-    direntry_t* directory;
-    directory = alloca(header.numlumps * sizeof(direntry_t));
-    fseek(handle, header.infotableofs, SEEK_SET);
-    fread(directory, sizeof(direntry_t), header.numlumps, handle);
+    direntry_t* directory = (direntry_t*) (wads[i] + header.infotableofs);
 
     int start_idx = numlumps;
     numlumps += header.numlumps;
 
-    lumpinfo = realloc(lumpinfo, numlumps * sizeof(lumpinfo_t));
+    lumpinfo = c_realloc(lumpinfo, numlumps * sizeof(lumpinfo_t), LT_STATIC);
     if (!lumpinfo) {
         LOG_ERROR("Unable to realloc lumpinfo");
         numlumps -= header.numlumps;
@@ -49,22 +56,27 @@ void add_file(char* filename)
 
     lumpinfo_t* lump = &lumpinfo[start_idx];
 
-    for (int i = start_idx; i < numlumps; i++,lump++,directory++) {
-        lump->handle = handle;
+    for (int j = start_idx; j < numlumps; j++,lump++,directory++) {
+        lump->wad_index = i;
         lump->position = directory->filepos;
         lump->size = directory->size;
         strncpy(lump->name, directory->name, 8);
     }
-
-    // TODO: files stay open, consider loading WADs in memory instead
 }
 
 void w_init_files(char** files)
 {
     numlumps = 0;
 
+    int numfiles = 0;
+    for (; files[numfiles]; numfiles++) {}
+
+    headers = c_malloc(numfiles * sizeof(wadinfo_t), LT_STATIC);
+    wads = c_malloc(numfiles * sizeof(void*), LT_STATIC);
+
+    int i = 0;
     for (; *files; files++)
-        add_file(*files);
+        add_file(*files, i++);
 
     if (!numlumps) {
         LOG_ERROR("No lumps loaded");
@@ -111,11 +123,22 @@ void* w_load_lump(int lump)
         exit(-1);
     }
 
-    void* buf = c_malloc(w_get_lump_length(lump), LT_STATIC);
+    uint8_t* buf = c_malloc(w_get_lump_length(lump), LT_STATIC);
 
     lumpinfo_t* l = lumpinfo+lump;
-    fseek(l->handle, l->position, SEEK_SET);
-    fread(buf, 1, l->size, l->handle);
+    uint8_t* ptr = (uint8_t*) (wads[l->wad_index] + l->position);
+    for (int i = 0; i < l->size; i++)
+        buf[i] = ptr[i];
 
-    return buf;
+    return (void*) buf;
+}
+
+void w_log_lumpinfo()
+{
+    LOG_INFO("Available lumps:");
+    for (int i = 0; i < numlumps; i++) {
+        lumpinfo_t lump = lumpinfo[i];
+        LOG_INFO("NAME: %8.8s POS: %8d SIZE: %d",
+                lump.name, lump.position, lump.size);
+    }
 }

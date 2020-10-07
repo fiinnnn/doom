@@ -44,13 +44,10 @@ typedef struct {
 /* lump info struct */
 typedef struct {
     char        name[8];       // lump name
-    FILE*       handle;        // file containing lump
+    uint32_t    wad_index;     // wad file index containing this lump
     uint32_t    position;      // lump position in file
     uint32_t    size;          // lump size
 } lumpinfo_t;
-
-extern int numlumps;
-extern lumpinfo_t* lumpinfo;
 
 /*
  * loads all provided files and fills lumpinfo
@@ -72,5 +69,10 @@ int w_get_lump_length(int lump);
  * allocates a buffer, loads lump contents, and returns a pointer to the buffer
  */
 void* w_load_lump(int lump);
+
+/*
+ * logs all lumps in the loaded files
+ */
+void w_log_lumpinfo();
 
 #endif // W_WAD_H

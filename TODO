@@ -1,6 +1,4 @@
-- Memory management
-    Similar to doom zone system, track allocated blocks of memory and include
-    flags when to free. Should eliminate the need to manually free blocks.
+Main:
 
 - Main game loop
     - Fixed timestep updates
@@ -21,3 +19,9 @@
     - Menu
 
 - Gameplay
+
+-----------------
+
+Misc:
+
+- WAD directory is stored twice in memory

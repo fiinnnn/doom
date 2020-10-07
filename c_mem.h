@@ -20,6 +20,11 @@
 void* c_malloc(size_t size, uint32_t lifetime);
 
 /*
+ * reallocate memory block to new size
+ */
+void* c_realloc(void* ptr, size_t size, uint32_t lifetime);
+
+/*
  * free memory
  */
 void c_free(void* ptr);

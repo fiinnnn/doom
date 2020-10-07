@@ -34,6 +34,28 @@ void* c_malloc(size_t size, uint32_t lifetime)
     return blk->ptr;
 }
 
+void* c_realloc(void* ptr, size_t size, uint32_t lifetime)
+{
+    if (ptr == NULL)
+        return c_malloc(size, lifetime);
+
+    if (size == 0) {
+        free(ptr);
+        return NULL;
+    }
+
+    memblock_t* cur = startblock;
+    while (cur) {
+        if (cur->ptr == ptr)
+            break;
+        cur = cur->next;
+    }
+
+    cur->lifetime = lifetime;
+    cur->ptr = realloc(ptr, size);
+    return cur->ptr;
+}
+
 void remove_block(memblock_t* blk, memblock_t* prev)
 {
     if (startblock == endblock) { // current block is start and end

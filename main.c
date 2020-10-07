@@ -25,11 +25,7 @@ int init() {
 
     w_init_files(files);
 
-    /*for (int i = 0; i < numlumps; i++) {
-        lumpinfo_t lump = lumpinfo[i];
-        LOG_DEBUG("NAME: %8.8s POS: %8d SIZE: %d",
-                lump.name, lump.position, lump.size);
-    }*/
+    //w_log_lumpinfo();
 
     p_load_level(1, 1);
 
