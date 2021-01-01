@@ -10,7 +10,7 @@
 /*
  * initializes automap
  */
-void am_init(uint32_t* buf);
+void am_init();
 
 /*
  * event handler

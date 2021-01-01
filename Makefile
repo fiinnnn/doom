@@ -8,7 +8,8 @@ OBJDIR=obj
 
 OBJS=\
 	$(OBJDIR)/log.o\
-	$(OBJDIR)/display.o\
+	$(OBJDIR)/i_video.o\
+	$(OBJDIR)/c_video.o\
 	$(OBJDIR)/c_mem.o\
 	$(OBJDIR)/w_wad.o\
 	$(OBJDIR)/p_level.o\

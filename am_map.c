@@ -2,6 +2,7 @@
 
 #include "def.h"
 #include "r_state.h"
+#include "c_video.h"
 
 #include <stdlib.h>
 #include <limits.h>
@@ -11,12 +12,12 @@ static int grid = 0;      // toggles grid drawing
 static int all_lines = 0; // toggles drawing all lines
 
 // colors
-#define GRID_COLOR          0x4F4F4FFF
-#define WALL_COLOR          0xB00000FF
-#define SECRET_COLOR        0x00B000FF
-#define FLOORCHANGE_COLOR   0xBF7B4BFF
-#define CEILINGCHANGE_COLOR 0xFFFF00FF
-#define MISC_LINEDEF_COLOR  0x707070FF
+#define GRID_COLOR          96
+#define WALL_COLOR          176
+#define SECRET_COLOR        112
+#define FLOORCHANGE_COLOR   64
+#define CEILINGCHANGE_COLOR 231
+#define MISC_LINEDEF_COLOR  96
 
 // map pan / zoom amounts
 #define PAN_INC      4
@@ -41,7 +42,7 @@ typedef struct {
     mpoint_t a, b;
 } mline_t;
 
-static uint32_t* fb;
+static uint8_t* fb;
 
 // map position in screen space
 static int am_x = 0;
@@ -93,11 +94,11 @@ void init_level()
     }
 }
 
-void am_init(uint32_t* buf)
+void am_init()
 {
     init_level();
 
-    fb = buf;
+    fb = framebuffers[0];
 
     scale = 0.2;
     scale_inv = 1.0/scale;

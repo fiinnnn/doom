@@ -4,10 +4,6 @@ Main:
     - Fixed timestep updates
     - Decouple from SDL events
 
-- Palette
-    Use 256 color palette. This would completely decouple the framebuffer
-    format from the rest of the engine.
-
 - Debug UI
     Immediate mode UI to make debugging easier.
     Nuklear / ImGui?

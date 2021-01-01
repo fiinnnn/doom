@@ -3,15 +3,13 @@
 #include <unistd.h>
 #include <SDL2/SDL.h>
 
-#include "display.h"
+#include "c_video.h"
 #include "def.h"
 #include "log.h"
 #include "c_mem.h"
 #include "w_wad.h"
 #include "p_level.h"
 #include "am_map.h"
-
-struct display *d;
 
 int init() {
     log_init();
@@ -34,22 +32,13 @@ int init() {
         return 0;
     }
 
-    d = malloc(sizeof(struct display));
-    d->width = 1280;
-    d->height = 720;
-
-    if(!display_init(d)) {
-        LOG_ERROR("Failed to initialize display");
-        return 0;
-    }
+    c_video_init(1280, 720);
 
     return 1;
 }
 
 void main_loop() {
-    uint32_t* buf = c_malloc(SCREENWIDTH * SCREENHEIGHT * sizeof(uint32_t), LT_STATIC);
-
-    am_init(buf);
+    am_init();
 
     int running = 1;
     SDL_Event event;
@@ -57,12 +46,12 @@ void main_loop() {
         am_update();
 
         // clear buffer
-        memset(buf, 0, SCREENWIDTH * SCREENHEIGHT * sizeof(uint32_t));
+        memset(framebuffers[0], 0, SCREENWIDTH * SCREENHEIGHT * sizeof(uint8_t));
 
         am_draw();
 
         // display
-        display_draw_frame(d, buf);
+        c_video_display_frame();
 
         while (SDL_PollEvent(&event)) {
             if ((event.type == SDL_QUIT) ||
@@ -88,7 +77,7 @@ int main()
 
     c_free_all();
 
-    display_destroy(d);
+    c_video_shutdown();
 
     return EXIT_SUCCESS;
 }
