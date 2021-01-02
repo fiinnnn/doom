@@ -2,8 +2,8 @@
  * logging system
  */
 
-#ifndef LOG_H
-#define LOG_H
+#ifndef C_LOG_H
+#define C_LOG_H
 
 #include <stdarg.h>
 
@@ -30,4 +30,4 @@ void log_write(int level, const char* file, int line, const char* fmt, ...);
 void log_set_level(int level);
 void log_set_quiet(int quiet);
 
-#endif // LOG_H
+#endif // C_LOG_H
