@@ -270,12 +270,12 @@ int clip_mline(mline_t* ml, sline_t* sl)
     // trivial rejects
     if (ml->a.y < vp_y)
         outcodea |= BOTTOM;
-    else if (ml->a.y >= vp_y + vp_h)
+    else if (ml->a.y > vp_y + vp_h)
         outcodea |= TOP;
 
     if (ml->b.y < vp_y)
         outcodeb |= BOTTOM;
-    else if (ml->b.y >= vp_y + vp_h)
+    else if (ml->b.y > vp_y + vp_h)
         outcodeb |= TOP;
 
     if (outcodea & outcodeb)
@@ -304,7 +304,7 @@ int clip_mline(mline_t* ml, sline_t* sl)
 #define OUTCODE(o, x, y) \
     (o) = INSIDE; \
     if ((y) < 0) (o) |= TOP; \
-    else if ((y) >= am_h) (o) |= BOTTOM; \
+    else if ((y) > am_h) (o) |= BOTTOM; \
     if ((x) < 0) (o) |= LEFT; \
     else if ((x) >= am_w) (o) |= RIGHT;
 
